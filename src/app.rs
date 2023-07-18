@@ -16,12 +16,11 @@ fn dims(width: f32, height: f32) -> (f32, f32) {
         return (width, height);
     }
     let aspect_ratio = height / width;
-    let size = if width >= height {
+    if width >= height {
         (1200.0, (1200.0 * aspect_ratio))
     } else {
         ((1200.0 / aspect_ratio), 1200.0)
-    };
-    size
+    }
 }
 
 fn to_color_image(img: &RgbaImage, width: u32, height: u32) -> ColorImage {
@@ -162,8 +161,8 @@ impl eframe::App for PixelUnsortApp {
                     if let Some(unsort_path) = &self.unsort_img_path {
                         ui.vertical_centered(|ui| {
                             if ui.button("Generate Image").clicked() {
-                                if let Ok(img1) = image::open(&sort_path) {
-                                    if let Ok(img2) = image::open(&unsort_path) {
+                                if let Ok(img1) = image::open(sort_path) {
+                                    if let Ok(img2) = image::open(unsort_path) {
                                         let size = dims(img1.width() as f32, img1.height() as f32);
                                         self.img = draw(&img1, &img2, self.sort_by, self.sort_key);
                                         self.texture = Some(ui.ctx().load_texture(

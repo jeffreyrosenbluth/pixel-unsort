@@ -52,25 +52,25 @@ fn hsl(r: u8, g: u8, b: u8) -> (f32, f32, f32) {
     use std::cmp::{max, min};
 
     let mut h: f32;
-    let s: f32;
-    let l: f32;
+    // let s: f32;
+    // let l: f32;
     let max = max(max(r, g), b);
     let min = min(min(r, g), b);
     let (r, g, b) = (r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0);
     let (min, max) = (min as f32 / 255.0, max as f32 / 255.0);
 
-    l = (max + min) / 2.0;
+    let l = (max + min) / 2.0;
 
     let delta: f32 = max - min;
     if delta == 0.0 {
         // it's gray
-        (0.0, 0.0, l);
+        return (0.0, 0.0, l);
     }
-    if l < 0.5 {
-        s = delta / (max + min);
+    let s = if l < 0.5 {
+        delta / (max + min)
     } else {
-        s = delta / (2.0 - max - min);
-    }
+        delta / (2.0 - max - min)
+    };
     let r2 = (((max - r) / 6.0) + (delta / 2.0)) / delta;
     let g2 = (((max - g) / 6.0) + (delta / 2.0)) / delta;
     let b2 = (((max - b) / 6.0) + (delta / 2.0)) / delta;
@@ -82,7 +82,7 @@ fn hsl(r: u8, g: u8, b: u8) -> (f32, f32, f32) {
     };
     if h < 0 as f32 {
         h += 1.0;
-    } else if h > 1 as f32 {
+    } else if h > 1.0 {
         h -= 1.0;
     }
     let h_degrees = (h * 360.0 * 100.0).round() / 100.0;

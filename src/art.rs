@@ -77,15 +77,15 @@ pub(crate) fn draw(
     };
 
     let px_map = match dir {
-        SortBy::Row => pixel_map_row(&sort_image, sort_fn, None),
-        SortBy::Column => pixel_map_column(&sort_image, sort_fn, None),
+        SortBy::Row => pixel_map_row(sort_image, sort_fn, None),
+        SortBy::Column => pixel_map_column(sort_image, sort_fn, None),
         SortBy::RowCol => {
-            let pm = pixel_map_row(&sort_image, sort_fn, None);
-            pixel_map_column(&sort_image, sort_fn, Some(pm))
+            let pm = pixel_map_row(sort_image, sort_fn, None);
+            pixel_map_column(sort_image, sort_fn, Some(pm))
         }
         SortBy::ColRow => {
-            let pm = pixel_map_column(&sort_image, sort_fn, None);
-            pixel_map_row(&sort_image, sort_fn, Some(pm))
+            let pm = pixel_map_column(sort_image, sort_fn, None);
+            pixel_map_row(sort_image, sort_fn, Some(pm))
         }
     };
     unsort(&unsort_image, &px_map)
