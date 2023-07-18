@@ -102,7 +102,10 @@ impl eframe::App for PixelUnsortApp {
                 ui.separator();
                 ui.add_space(SPACE);
                 if ui.button("Sort Image Path").clicked() {
-                    if let Some(path) = rfd::FileDialog::new().pick_file() {
+                    if let Some(path) = rfd::FileDialog::new()
+                        .add_filter("image", &["png", "jpg", "jpeg"])
+                        .pick_file()
+                    {
                         self.sort_img_path = Some(path.display().to_string());
                     }
                 }
@@ -114,7 +117,10 @@ impl eframe::App for PixelUnsortApp {
                 ui.separator();
                 ui.add_space(SPACE);
                 if ui.button("Unsort Image Path").clicked() {
-                    if let Some(path) = rfd::FileDialog::new().pick_file() {
+                    if let Some(path) = rfd::FileDialog::new()
+                        .add_filter("image", &["png", "jpg", "jpeg"])
+                        .pick_file()
+                    {
                         self.unsort_img_path = Some(path.display().to_string());
                     }
                 }

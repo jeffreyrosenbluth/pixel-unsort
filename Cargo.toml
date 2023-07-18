@@ -1,5 +1,5 @@
 [package]
-name = "pixel_unosrt"
+name = "pixel_unsort"
 version = "0.1.0"
 authors = ["Jeffrey Rosenbluth <jeffrey.rosenbluth@gmail.com>"]
 edition = "2021"

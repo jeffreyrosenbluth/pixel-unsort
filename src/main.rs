@@ -19,7 +19,7 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "pixel unsort",
         native_options,
-        Box::new(|cc| Box::new(pixel_unosrt::PixelUnsortApp::new(cc))),
+        Box::new(|cc| Box::new(pixel_unsort::PixelUnsortApp::new(cc))),
     )
 }
 
