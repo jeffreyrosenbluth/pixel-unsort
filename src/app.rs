@@ -2,7 +2,7 @@ use crate::art::*;
 use crate::sortfns::*;
 use directories::UserDirs;
 use egui::ComboBox;
-use egui::{ColorImage, Frame, TextureHandle};
+use egui::{Button, ColorImage, Frame, TextureHandle, Vec2};
 use image::{
     imageops::{self, FilterType},
     RgbaImage,
@@ -43,6 +43,8 @@ pub struct PixelUnsortApp {
     unsort_img_path: Option<String>,
     sort_by: SortBy,
     sort_key: SortKey,
+    row_sort_order: SortOrder,
+    col_sort_order: SortOrder,
 }
 
 impl Default for PixelUnsortApp {
@@ -54,6 +56,8 @@ impl Default for PixelUnsortApp {
             texture: None,
             sort_by: SortBy::Row,
             sort_key: SortKey::Lightness,
+            row_sort_order: SortOrder::Ascending,
+            col_sort_order: SortOrder::Ascending,
         }
     }
 }
@@ -100,7 +104,11 @@ impl eframe::App for PixelUnsortApp {
                 ui.heading("Controls");
                 ui.separator();
                 ui.add_space(SPACE);
-                if ui.button("Sort Image Path").clicked() {
+                if ui
+                    .add(Button::new("Sort Image Path").min_size(Vec2::new(125.0, 25.0)))
+                    .clicked()
+                {
+                    // if ui.button("Sort Image Path").clicked() {
                     if let Some(path) = rfd::FileDialog::new()
                         .add_filter("image", &["png", "jpg", "jpeg"])
                         .pick_file()
@@ -115,7 +123,10 @@ impl eframe::App for PixelUnsortApp {
                 ui.add_space(SPACE);
                 ui.separator();
                 ui.add_space(SPACE);
-                if ui.button("Unsort Image Path").clicked() {
+                if ui
+                    .add(Button::new("Unsort Image Path").min_size(Vec2::new(125.0, 25.0)))
+                    .clicked()
+                {
                     if let Some(path) = rfd::FileDialog::new()
                         .add_filter("image", &["png", "jpg", "jpeg"])
                         .pick_file()
@@ -138,6 +149,7 @@ impl eframe::App for PixelUnsortApp {
                 });
                 ui.add_space(SPACE);
                 ComboBox::from_label("Sort Key")
+                    .width(125.0)
                     .selected_text(format!("{:?}", self.sort_key))
                     .show_ui(ui, |ui| {
                         ui.style_mut().wrap = Some(false);
@@ -150,7 +162,46 @@ impl eframe::App for PixelUnsortApp {
                         ui.selectable_value(&mut self.sort_key, SortKey::Blue, "Blue");
                     });
                 ui.add_space(SPACE);
-                if ui.button("Swap Images").clicked() {
+                ComboBox::from_label("Row Order")
+                    .width(125.0)
+                    .selected_text(format!("{:?}", self.row_sort_order))
+                    .show_ui(ui, |ui| {
+                        ui.style_mut().wrap = Some(false);
+                        ui.set_min_width(60.0);
+                        ui.selectable_value(
+                            &mut self.row_sort_order,
+                            SortOrder::Ascending,
+                            "Ascending",
+                        );
+                        ui.selectable_value(
+                            &mut self.row_sort_order,
+                            SortOrder::Descending,
+                            "Descending",
+                        );
+                    });
+                ui.add_space(SPACE);
+                ComboBox::from_label("Column Order")
+                    .width(125.0)
+                    .selected_text(format!("{:?}", self.col_sort_order))
+                    .show_ui(ui, |ui| {
+                        ui.style_mut().wrap = Some(false);
+                        ui.set_min_width(60.0);
+                        ui.selectable_value(
+                            &mut self.col_sort_order,
+                            SortOrder::Ascending,
+                            "Ascending",
+                        );
+                        ui.selectable_value(
+                            &mut self.col_sort_order,
+                            SortOrder::Descending,
+                            "Descending",
+                        );
+                    });
+                ui.add_space(SPACE);
+                if ui
+                    .add(Button::new("Swap Images").min_size(Vec2::new(125.0, 25.0)))
+                    .clicked()
+                {
                     (self.sort_img_path, self.unsort_img_path) =
                         (self.unsort_img_path.clone(), self.sort_img_path.clone());
                 }
@@ -160,11 +211,22 @@ impl eframe::App for PixelUnsortApp {
                 if let Some(sort_path) = &self.sort_img_path {
                     if let Some(unsort_path) = &self.unsort_img_path {
                         ui.vertical_centered(|ui| {
-                            if ui.button("Generate Image").clicked() {
+                            if ui
+                                .add(Button::new("Unsort Image").min_size(Vec2::new(125.0, 25.0)))
+                                .clicked()
+                            {
                                 if let Ok(img1) = image::open(sort_path) {
                                     if let Ok(img2) = image::open(unsort_path) {
                                         let size = dims(img1.width() as f32, img1.height() as f32);
-                                        self.img = draw(&img1, &img2, self.sort_by, self.sort_key);
+                                        self.img = draw(
+                                            &img1,
+                                            &img2,
+                                            self.sort_by,
+                                            self.sort_key,
+                                            DrawType::Unsort,
+                                            self.row_sort_order,
+                                            self.col_sort_order,
+                                        );
                                         self.texture = Some(ui.ctx().load_texture(
                                             "unsort",
                                             to_color_image(&self.img, size.0 as u32, size.1 as u32),
@@ -172,13 +234,39 @@ impl eframe::App for PixelUnsortApp {
                                         ));
                                     }
                                 }
+                            };
+                            ui.add_space(2.0 * SPACE);
+                            if ui
+                                .add(Button::new("Sort Image").min_size(Vec2::new(125.0, 25.0)))
+                                .clicked()
+                            {
+                                if let Ok(img1) = image::open(sort_path) {
+                                    let size = dims(img1.width() as f32, img1.height() as f32);
+                                    self.img = draw(
+                                        &img1,
+                                        &img1,
+                                        self.sort_by,
+                                        self.sort_key,
+                                        DrawType::Sort,
+                                        self.row_sort_order,
+                                        self.col_sort_order,
+                                    );
+                                    self.texture = Some(ui.ctx().load_texture(
+                                        "unsort",
+                                        to_color_image(&self.img, size.0 as u32, size.1 as u32),
+                                        Default::default(),
+                                    ));
+                                }
                             }
                         });
                     }
                 };
                 ui.add_space(2.0 * SPACE);
                 ui.vertical_centered(|ui| {
-                    if ui.button("Save png").clicked() {
+                    if ui
+                        .add(Button::new("Save png").min_size(Vec2::new(125.0, 25.0)))
+                        .clicked()
+                    {
                         let dirs = UserDirs::new().unwrap();
                         let dir = dirs.download_dir().unwrap();
                         let path = format!(r"{}/{}", dir.to_string_lossy(), "pixel_unsort");
