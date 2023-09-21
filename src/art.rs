@@ -3,6 +3,7 @@ use image::*;
 
 use crate::matrix::*;
 use crate::sortfns::*;
+use rayon::prelude::*;
 
 type ImgGrid = Matrix<(usize, usize)>;
 
@@ -34,8 +35,11 @@ pub fn pixel_map_row(
     for y in 0..px_map.height {
         let mut row = px_map[y].to_vec();
         row.sort_by_key(|x| order.dir() * f(img.get_pixel(x.0 as u32, x.1 as u32)));
+        let mut indices = (0..row.len()).collect::<Vec<_>>();
+        indices.sort_by_key(|i| row[*i].0);
+        let row1 = indices.iter().map(|i| (*i, y)).collect::<Vec<_>>();
         for (i, e) in px_map[y].iter_mut().enumerate() {
-            *e = row[i];
+            *e = row1[i];
         }
     }
     px_map
@@ -54,8 +58,11 @@ pub fn pixel_map_column(
     for x in 0..px_map.width {
         let mut column = px_map.get_column(x);
         column.sort_by_key(|y| order.dir() * f(img.get_pixel(y.0 as u32, y.1 as u32)));
+        let mut indices = (0..column.len()).collect::<Vec<_>>();
+        indices.sort_by_key(|i| column[*i].1);
+        let column1 = indices.iter().map(|i| (x, *i)).collect::<Vec<_>>();
         for y in 0..px_map.height {
-            px_map[y][x] = column[y]
+            px_map[y][x] = column1[y]
         }
     }
     px_map
@@ -68,13 +75,27 @@ pub fn pixel_sort(img: &DynamicImage, px_map: &ImgGrid) -> RgbaImage {
     })
 }
 
-pub fn unsort(img: &DynamicImage, px_map: &ImgGrid) -> RgbaImage {
+pub fn pixel_unsort(img: &DynamicImage, px_map: &ImgGrid) -> RgbaImage {
+    // let mut buffer: Vec<(usize, usize)> = Vec::with_capacity(&px_map.width * &px_map.height);
+    // for i in 0..px_map.height {
+    //     for j in 0..px_map.width {
+    //         buffer.push((j, i));
+    //     }
+    // }
+    // let mut out_image = RgbaImage::new(img.width(), img.height());
+    // let par_iter = buffer.par_iter().map(|p| {
+    //     let c = img.get_pixel(p.0 as u32, p.1 as u32);
+    //     let (x1, y1) = px_map[p.1 as usize][p.0 as usize];
+    //     out_image.put_pixel(x1 as u32, y1 as u32, c);
+    // });
+    // let img_data: Vec<u8> = par_iter.collect();
+    // img_data
     let mut out_image = RgbaImage::new(img.width(), img.height());
     for y in 0..px_map.height {
         for x in 0..px_map.width {
-            let p = img.get_pixel(x as u32, y as u32);
             let (x1, y1) = px_map[y][x];
-            out_image.put_pixel(x1 as u32, y1 as u32, p)
+            let p = img.get_pixel(x1 as u32, y1 as u32);
+            out_image.put_pixel(x as u32, y as u32, p)
         }
     }
     out_image
@@ -104,9 +125,6 @@ pub(crate) fn draw(
         SortKey::Lightness => luma,
         SortKey::Hue => hue,
         SortKey::Saturation => sat,
-        SortKey::Red => red,
-        SortKey::Green => green,
-        SortKey::Blue => blue,
     };
 
     let px_map = match dir {
@@ -123,6 +141,6 @@ pub(crate) fn draw(
     };
     match draw_type {
         DrawType::Sort => pixel_sort(&sort_image, &px_map),
-        DrawType::Unsort => unsort(&unsort_image, &px_map),
+        DrawType::Unsort => pixel_unsort(&unsort_image, &px_map),
     }
 }

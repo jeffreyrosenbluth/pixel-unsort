@@ -108,7 +108,6 @@ impl eframe::App for PixelUnsortApp {
                     .add(Button::new("Sort Image Path").min_size(Vec2::new(125.0, 25.0)))
                     .clicked()
                 {
-                    // if ui.button("Sort Image Path").clicked() {
                     if let Some(path) = rfd::FileDialog::new()
                         .add_filter("image", &["png", "jpg", "jpeg"])
                         .pick_file()
@@ -157,9 +156,6 @@ impl eframe::App for PixelUnsortApp {
                         ui.selectable_value(&mut self.sort_key, SortKey::Lightness, "Lightness");
                         ui.selectable_value(&mut self.sort_key, SortKey::Hue, "Hue");
                         ui.selectable_value(&mut self.sort_key, SortKey::Saturation, "Saturation");
-                        ui.selectable_value(&mut self.sort_key, SortKey::Red, "Red");
-                        ui.selectable_value(&mut self.sort_key, SortKey::Green, "Green");
-                        ui.selectable_value(&mut self.sort_key, SortKey::Blue, "Blue");
                     });
                 ui.add_space(SPACE);
                 ComboBox::from_label("Row Order")

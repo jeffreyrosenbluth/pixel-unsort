@@ -13,27 +13,12 @@ pub(crate) enum SortKey {
     Lightness,
     Hue,
     Saturation,
-    Red,
-    Green,
-    Blue,
 }
 
 pub(crate) type SortFn = fn(Rgba<u8>) -> i16;
 
 pub(crate) fn luma(c: Rgba<u8>) -> i16 {
     c.to_luma()[0] as i16
-}
-
-pub(crate) fn red(c: Rgba<u8>) -> i16 {
-    c[0] as i16
-}
-
-pub(crate) fn green(c: Rgba<u8>) -> i16 {
-    c[1] as i16
-}
-
-pub(crate) fn blue(c: Rgba<u8>) -> i16 {
-    c[2] as i16
 }
 
 pub(crate) fn hue(c: Rgba<u8>) -> i16 {
