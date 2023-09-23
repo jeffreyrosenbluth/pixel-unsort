@@ -1,3 +1,5 @@
+use std::ops::Neg;
+
 use image::imageops::FilterType;
 use image::*;
 
@@ -18,6 +20,16 @@ impl SortOrder {
         match self {
             SortOrder::Ascending => 1,
             SortOrder::Descending => -1,
+        }
+    }
+}
+
+impl Neg for SortOrder {
+    type Output = Self;
+    fn neg(self) -> Self::Output {
+        match self {
+            SortOrder::Ascending => SortOrder::Descending,
+            SortOrder::Descending => SortOrder::Ascending,
         }
     }
 }
@@ -73,6 +85,31 @@ pub fn pixel_sort(img: &DynamicImage, px_map: &ImgGrid) -> RgbaImage {
         let (x1, y1) = px_map[y as usize][x as usize];
         img.get_pixel(x1 as u32, y1 as u32)
     })
+}
+
+pub fn pixel_sort_row(img: &DynamicImage, f: SortFn, order: SortOrder) -> RgbaImage {
+    let mut data: Vec<u8> = Vec::with_capacity(16 * img.width() as usize * img.height() as usize);
+    let buffer = img.to_rgba8();
+    for buf_row in buffer.rows() {
+        let mut row = Vec::with_capacity(buf_row.len());
+        for p in buf_row {
+            row.push(*p);
+        }
+        row.sort_by_key(|p| order.dir() * f(*p));
+        for p in row {
+            for c in p.channels() {
+                data.push(*c);
+            }
+        }
+    }
+    ImageBuffer::from_vec(img.width(), img.height(), data).unwrap()
+}
+
+pub fn pixel_sort_column(img: &DynamicImage, f: SortFn, order: SortOrder) -> RgbaImage {
+    let rotate_img = img.rotate90();
+    let sorted_img = pixel_sort_row(&rotate_img, f, -order);
+    let dyn_img = DynamicImage::ImageRgba8(sorted_img);
+    dyn_img.rotate270().into_rgba8()
 }
 
 pub fn pixel_unsort(img: &DynamicImage, px_map: &ImgGrid) -> RgbaImage {
@@ -140,7 +177,18 @@ pub(crate) fn draw(
         }
     };
     match draw_type {
-        DrawType::Sort => pixel_sort(&sort_image, &px_map),
+        DrawType::Sort => match dir {
+            SortBy::Row => pixel_sort_row(sort_image, sort_fn, row_sort_order),
+            SortBy::Column => pixel_sort_column(&sort_image, sort_fn, col_sort_order),
+            SortBy::RowCol => {
+                let row_sort = pixel_sort_row(sort_image, sort_fn, row_sort_order);
+                pixel_sort_column(&DynamicImage::ImageRgba8(row_sort), sort_fn, col_sort_order)
+            }
+            SortBy::ColRow => {
+                let col_sort = pixel_sort_column(sort_image, sort_fn, col_sort_order);
+                pixel_sort_row(&DynamicImage::ImageRgba8(col_sort), sort_fn, row_sort_order)
+            }
+        },
         DrawType::Unsort => pixel_unsort(&unsort_image, &px_map),
     }
 }
