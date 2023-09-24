@@ -6,6 +6,7 @@ pub(crate) enum SortBy {
     Column,
     ColRow,
     RowCol,
+    Nothing,
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize, Clone, Copy)]

@@ -2,6 +2,7 @@ use crate::art::*;
 use crate::sortfns::*;
 use directories::UserDirs;
 use egui::ComboBox;
+use egui::SelectableLabel;
 use egui::{Button, ColorImage, Frame, TextureHandle, Vec2};
 use image::{
     imageops::{self, FilterType},
@@ -45,6 +46,7 @@ pub struct PixelUnsortApp {
     sort_key: SortKey,
     row_sort_order: SortOrder,
     col_sort_order: SortOrder,
+    pre_sort: bool,
 }
 
 impl Default for PixelUnsortApp {
@@ -58,6 +60,7 @@ impl Default for PixelUnsortApp {
             sort_key: SortKey::Lightness,
             row_sort_order: SortOrder::Ascending,
             col_sort_order: SortOrder::Ascending,
+            pre_sort: false,
         }
     }
 }
@@ -140,11 +143,14 @@ impl eframe::App for PixelUnsortApp {
                 ui.add_space(SPACE);
                 ui.separator();
                 ui.add_space(SPACE);
+                ui.checkbox(&mut self.pre_sort, "Pre-Sort");
+                ui.add_space(SPACE);
                 ui.horizontal(|ui| {
                     ui.radio_value(&mut self.sort_by, SortBy::Row, "Rows");
                     ui.radio_value(&mut self.sort_by, SortBy::Column, "Columns");
                     ui.radio_value(&mut self.sort_by, SortBy::ColRow, "ColRow");
                     ui.radio_value(&mut self.sort_by, SortBy::RowCol, "RowCol");
+                    ui.radio_value(&mut self.sort_by, SortBy::Nothing, "Nothing");
                 });
                 ui.add_space(SPACE);
                 ComboBox::from_label("Sort Key")
@@ -222,6 +228,7 @@ impl eframe::App for PixelUnsortApp {
                                             DrawType::Unsort,
                                             self.row_sort_order,
                                             self.col_sort_order,
+                                            self.pre_sort,
                                         );
                                         self.texture = Some(ui.ctx().load_texture(
                                             "unsort",
@@ -246,6 +253,7 @@ impl eframe::App for PixelUnsortApp {
                                         DrawType::Sort,
                                         self.row_sort_order,
                                         self.col_sort_order,
+                                        self.pre_sort,
                                     );
                                     self.texture = Some(ui.ctx().load_texture(
                                         "unsort",
