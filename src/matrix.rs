@@ -1,3 +1,5 @@
+//! A Row major matrix with arbitrary data in each cell
+
 #![allow(dead_code)]
 use num_traits::{AsPrimitive, One, Zero};
 use std::ops::{Index, IndexMut};
