@@ -9,7 +9,7 @@ use rayon::prelude::*;
 
 type ImgGrid = Matrix<(usize, usize)>;
 
-#[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Clone, Copy)]
 pub enum SortOrder {
     Ascending,
     Descending,
@@ -192,7 +192,7 @@ pub(crate) fn draw(
     match draw_type {
         DrawType::Sort => match dir {
             SortBy::Row => pixel_sort_row(sort_image, sort_fn, row_sort_order),
-            SortBy::Column => pixel_sort_column(&sort_image, sort_fn, col_sort_order),
+            SortBy::Column => pixel_sort_column(sort_image, sort_fn, col_sort_order),
             SortBy::RowCol => {
                 let row_sort = pixel_sort_row(sort_image, sort_fn, row_sort_order);
                 pixel_sort_column(&DynamicImage::ImageRgba8(row_sort), sort_fn, col_sort_order)
@@ -201,7 +201,7 @@ pub(crate) fn draw(
                 let col_sort = pixel_sort_column(sort_image, sort_fn, col_sort_order);
                 pixel_sort_row(&DynamicImage::ImageRgba8(col_sort), sort_fn, row_sort_order)
             }
-            SortBy::Nothing => pixel_unsort(&sort_image, &px_map),
+            SortBy::Nothing => pixel_unsort(sort_image, &px_map),
         },
         DrawType::Unsort => pixel_unsort(&unsort_image, &px_map),
     }

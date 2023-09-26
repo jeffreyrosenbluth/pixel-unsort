@@ -2,7 +2,6 @@ use crate::art::*;
 use crate::sortfns::*;
 use directories::UserDirs;
 use egui::ComboBox;
-use egui::SelectableLabel;
 use egui::{Button, ColorImage, Frame, TextureHandle, Vec2};
 use image::{
     imageops::{self, FilterType},
