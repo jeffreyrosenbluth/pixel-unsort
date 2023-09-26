@@ -6,6 +6,7 @@ pub(crate) enum SortBy {
     Column,
     ColRow,
     RowCol,
+    Nothing,
 }
 
 #[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize, Clone, Copy)]
@@ -13,39 +14,24 @@ pub(crate) enum SortKey {
     Lightness,
     Hue,
     Saturation,
-    Red,
-    Green,
-    Blue,
 }
 
-pub(crate) type SortFn = fn(Rgba<u8>) -> u8;
+pub(crate) type SortFn = fn(Rgba<u8>) -> i16;
 
-pub(crate) fn luma(c: Rgba<u8>) -> u8 {
-    c.to_luma()[0]
+pub(crate) fn luma(c: Rgba<u8>) -> i16 {
+    c.to_luma()[0] as i16
 }
 
-pub(crate) fn red(c: Rgba<u8>) -> u8 {
-    c[0]
-}
-
-pub(crate) fn green(c: Rgba<u8>) -> u8 {
-    c[1]
-}
-
-pub(crate) fn blue(c: Rgba<u8>) -> u8 {
-    c[2]
-}
-
-pub(crate) fn hue(c: Rgba<u8>) -> u8 {
+pub(crate) fn hue(c: Rgba<u8>) -> i16 {
     let hsl = hsl(c[0], c[1], c[2]);
     let hue = hsl.0 / 360.0 * 255.0;
-    hue as u8
+    hue as i16
 }
 
-pub(crate) fn sat(c: Rgba<u8>) -> u8 {
+pub(crate) fn sat(c: Rgba<u8>) -> i16 {
     let hsl = hsl(c[0], c[1], c[2]);
     let sat = hsl.1 * 255.0;
-    sat as u8
+    sat as i16
 }
 
 fn hsl(r: u8, g: u8, b: u8) -> (f32, f32, f32) {

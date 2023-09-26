@@ -2006,6 +2006,7 @@ dependencies = [
  "image",
  "log",
  "num-traits",
+ "rayon",
  "rfd",
  "serde",
  "wasm-bindgen-futures",
