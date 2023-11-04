@@ -1,5 +1,5 @@
 use crate::art::*;
-use crate::sortfns::*;
+use crate::core::*;
 use directories::UserDirs;
 use egui::ComboBox;
 use egui::{Button, ColorImage, Frame, TextureHandle, Vec2};

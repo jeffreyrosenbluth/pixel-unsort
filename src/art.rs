@@ -1,39 +1,12 @@
-use std::ops::Neg;
-
+use crate::core::*;
 use crate::matrix::*;
+use crate::sortfns::*;
 use image::imageops::FilterType;
 use image::*;
-
-use crate::sortfns::*;
 use rayon::prelude::*;
 
-type ImgGrid = Matrix<(usize, usize)>;
-
-#[derive(Debug, PartialEq, Eq, serde::Deserialize, serde::Serialize, Clone, Copy)]
-pub enum SortOrder {
-    Ascending,
-    Descending,
-}
-
-impl SortOrder {
-    fn dir(self) -> i16 {
-        match self {
-            SortOrder::Ascending => 1,
-            SortOrder::Descending => -1,
-        }
-    }
-}
-
-impl Neg for SortOrder {
-    type Output = Self;
-    fn neg(self) -> Self::Output {
-        match self {
-            SortOrder::Ascending => SortOrder::Descending,
-            SortOrder::Descending => SortOrder::Ascending,
-        }
-    }
-}
-
+// Generate an image grid with the location of each pixel in the image.
+// Sort the pixels in each row by the sort function.
 pub fn pixel_map_row(
     img: &DynamicImage,
     f: SortFn,
@@ -57,6 +30,8 @@ pub fn pixel_map_row(
     px_map
 }
 
+// Generate an image grid with the location of each pixel in the image.
+// Sort the pixels in each column by the sort function.
 pub fn pixel_map_column(
     img: &DynamicImage,
     f: SortFn,
@@ -80,6 +55,7 @@ pub fn pixel_map_column(
     px_map
 }
 
+// Pixel sort a DynamicImage by rows.
 pub fn pixel_sort_row(img: &DynamicImage, f: SortFn, order: SortOrder) -> RgbaImage {
     let mut data: Vec<u8> = Vec::with_capacity(16 * img.width() as usize * img.height() as usize);
     let buffer = img.to_rgba8();
@@ -98,6 +74,7 @@ pub fn pixel_sort_row(img: &DynamicImage, f: SortFn, order: SortOrder) -> RgbaIm
     ImageBuffer::from_vec(img.width(), img.height(), data).unwrap()
 }
 
+// Pixel sort a DynamicImage by columns.
 pub fn pixel_sort_column(img: &DynamicImage, f: SortFn, order: SortOrder) -> RgbaImage {
     let rotate_img = img.rotate90();
     let sorted_img = pixel_sort_row(&rotate_img, f, -order);
@@ -105,6 +82,7 @@ pub fn pixel_sort_column(img: &DynamicImage, f: SortFn, order: SortOrder) -> Rgb
     dyn_img.rotate270().into_rgba8()
 }
 
+// Unsort the image using the pixel map.
 pub fn pixel_unsort(img: &DynamicImage, px_map: &ImgGrid) -> RgbaImage {
     let mut out_image = RgbaImage::new(img.width(), img.height());
     for y in 0..px_map.height {
@@ -117,6 +95,7 @@ pub fn pixel_unsort(img: &DynamicImage, px_map: &ImgGrid) -> RgbaImage {
     out_image
 }
 
+// Choose between Pixel Sort and Pixel Unsort.
 pub enum DrawType {
     Sort,
     Unsort,

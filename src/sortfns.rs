@@ -1,21 +1,5 @@
 use image::*;
 
-#[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize, Clone, Copy)]
-pub(crate) enum SortBy {
-    Row,
-    Column,
-    ColRow,
-    RowCol,
-    Nothing,
-}
-
-#[derive(Debug, PartialEq, serde::Deserialize, serde::Serialize, Clone, Copy)]
-pub(crate) enum SortKey {
-    Lightness,
-    Hue,
-    Saturation,
-}
-
 pub(crate) type SortFn = fn(Rgba<u8>) -> i16;
 
 pub(crate) fn luma(c: Rgba<u8>) -> i16 {

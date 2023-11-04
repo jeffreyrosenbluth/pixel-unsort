@@ -4,5 +4,6 @@
 mod app;
 pub use app::PixelUnsortApp;
 pub mod art;
+pub mod core;
 pub mod matrix;
 pub mod sortfns;
