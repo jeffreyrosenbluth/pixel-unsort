@@ -5,6 +5,7 @@ authors = ["Jeffrey Rosenbluth <jeffrey.rosenbluth@gmail.com>"]
 edition = "2021"
 rust-version = "1.73"
 license = "MIT OR Apache-2.0"
+description = "The Pixel Unsort algorithm."
 
 [dependencies]
 egui = "0.23.0"
@@ -23,15 +24,7 @@ num-traits = "0.2.15"
 rfd = "0.12.0"
 directories = "5.0.1"
 rayon = "1.7.0"
-
-# native:
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 env_logger = "0.10"
-
-# web:
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen-futures = "0.4"
-
 
 [profile.release]
 opt-level = 2 # fast and small wasm
@@ -40,5 +33,15 @@ opt-level = 2 # fast and small wasm
 [profile.dev.package."*"]
 opt-level = 2
 
-
 [patch.crates-io]
+
+[package.metadata.bundle]
+name = "Pixel Unsort"
+identifier = "com.applausecode.pixelunsort"
+icon = ["icon_ios_touch_192.png", "icon-256.png", "icon-1024.png", "maskable_icon_x512.png", "native_icon.png"]
+version = "0.1.0"
+resources = ["assets"]
+copyright = "Copyright (c) Jeffrey Rosnebluth 2023. All rights reserved."
+category = "Graphics and Design"
+short_description = "The Pixel Unsort algorithm."
+osx_url_schemes = ["com.applausecode.pixelunsort"]

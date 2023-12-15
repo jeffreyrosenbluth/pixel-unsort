@@ -3,4 +3,4 @@ Released under [MIT](/LICENSE) by [@jeffreyrosenbluth](https://github.com/jeffre
 
 # Pixel Unsorting
 
-<img src="https://github.com/jeffreyrosenbluth/pixel-unsort/blob/main/unsort.png?raw=true" alt="unsort image" width="500" />
+<img src="https://github.com/jeffreyrosenbluth/pixel-unsort/blob/main/unsort.png?raw=true" alt="unsort image" width="800" />

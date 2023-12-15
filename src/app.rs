@@ -296,7 +296,6 @@ impl eframe::App for PixelUnsortApp {
                 ui.horizontal(|ui| {
                     ui.add_space(SPACE);
                     ui.add_sized(egui::vec2(size.0, size.1), egui::Image::new(txt));
-                    // ui.add_sized(egui::vec2(size.0, size.1), egui::Image::new(txt, img_size));
                 });
             }
         });

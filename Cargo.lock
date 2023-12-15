@@ -2050,7 +2050,6 @@ dependencies = [
  "rayon",
  "rfd",
  "serde",
- "wasm-bindgen-futures",
 ]
 
 [[package]]
